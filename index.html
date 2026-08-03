@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket hôm nay — Sprint 10tr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1C2027;
+    --panel:#252A33;
+    --panel2:#2C323C;
+    --border:#3A4049;
+    --text:#E7E9EC;
+    --muted:#8B93A1;
+    --amber:#E8993E;
+    --green:#3FBF7F;
+    --red:#E2584A;
+    --blue:#5B9FE8;
+    --violet:#B98CE8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .app{max-width:640px;margin:0 auto;padding:20px 16px 60px;}
+
+  /* Header / ticket bar */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:18px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .dot{
+    width:10px;height:10px;border-radius:50%;background:var(--amber);
+    box-shadow:0 0 0 4px rgba(232,153,62,0.18);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;} 50%{opacity:.4;}
+  }
+  .brand-text .t1{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;}
+  .brand-text .t2{font-size:15px;font-weight:600;}
+  .ticket-id{
+    font-size:11px;color:var(--muted);text-align:right;line-height:1.5;
+  }
+  .ticket-id b{color:var(--amber);}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--panel);
+    padding:4px;border-radius:10px;border:1px solid var(--border);}
+  .tab{
+    flex:1;text-align:center;padding:9px 6px;border-radius:7px;
+    font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;
+    transition:.15s;
+  }
+  .tab.active{background:var(--panel2);color:var(--text);}
+
+  /* Progress strip */
+  .progress-wrap{margin-bottom:22px;}
+  .progress-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .progress-bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden;border:1px solid var(--border);}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--amber),#F2B968);border-radius:99px;transition:width .4s;}
+
+  /* Section card */
+  .card{
+    background:var(--panel);border:1px solid var(--border);
+    border-radius:14px;padding:18px;margin-bottom:16px;
+  }
+  .phase-tag{
+    display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;
+    padding:3px 9px;border-radius:99px;background:rgba(232,153,62,.15);
+    color:var(--amber);margin-bottom:10px;
+  }
+  .day-title{font-size:19px;font-weight:600;margin:0 0 4px;}
+  .day-sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+
+  /* Task list */
+  .task{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:12px 0;border-top:1px solid var(--border);
+  }
+  .task:first-of-type{border-top:none;}
+  .task.done .task-text{color:var(--muted);text-decoration:line-through;}
+  .checkbox{
+    flex:none;width:20px;height:20px;border-radius:6px;
+    border:1.5px solid var(--border);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    margin-top:1px;transition:.15s;
+  }
+  .checkbox.checked{background:var(--green);border-color:var(--green);}
+  .checkbox svg{width:12px;height:12px;display:none;}
+  .checkbox.checked svg{display:block;}
+  .task-body{flex:1;}
+  .task-tag{
+    display:inline-block;font-size:10px;font-weight:600;letter-spacing:.04em;
+    padding:2px 7px;border-radius:5px;margin-bottom:5px;
+  }
+  .tag-tiktok{background:rgba(91,159,232,.15);color:var(--blue);}
+  .tag-ai{background:rgba(63,191,127,.15);color:var(--green);}
+  .tag-dichvu{background:rgba(232,153,62,.15);color:var(--amber);}
+  .tag-congviec{background:rgba(226,88,74,.15);color:var(--red);}
+  .tag-suckhoe{background:rgba(139,147,161,.2);color:var(--muted);}
+  .tag-hocai{background:rgba(185,140,232,.16);color:var(--violet);}
+  .week-topic{
+    display:flex;gap:8px;align-items:center;background:rgba(185,140,232,.1);
+    border:1px solid rgba(185,140,232,.3);border-radius:10px;padding:9px 12px;
+    font-size:12.5px;margin-bottom:14px;color:#D3B6F2;
+  }
+  .week-topic b{color:#fff;}
+  .task-text{font-size:14px;line-height:1.5;}
+
+  .empty-note{font-size:13px;color:var(--muted);line-height:1.6;}
+
+  /* Streak footer */
+  .stats-row{display:flex;gap:10px;margin-bottom:16px;}
+  .stat{
+    flex:1;background:var(--panel);border:1px solid var(--border);
+    border-radius:12px;padding:12px;text-align:center;
+  }
+  .stat .n{font-size:20px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+  .stat .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+  /* Roadmap tab */
+  .phase-block{margin-bottom:14px;}
+  .phase-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .phase-head h3{font-size:14px;margin:0;}
+  .phase-head span{font-size:11px;color:var(--muted);}
+  .week-grid{display:flex;gap:6px;}
+  .week-cell{
+    flex:1;height:34px;border-radius:8px;background:var(--panel2);
+    border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    position:relative;
+  }
+  .week-cell.current{border-color:var(--amber);color:var(--amber);font-weight:700;}
+  .week-cell.past{background:rgba(63,191,127,.12);color:var(--green);}
+  .goal-card{
+    background:linear-gradient(135deg, rgba(232,153,62,.12), rgba(232,153,62,.03));
+    border:1px solid rgba(232,153,62,.35);
+  }
+  .goal-card .n{font-size:28px;font-weight:700;color:var(--amber);font-family:'IBM Plex Mono',monospace;}
+
+  .settings-row{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-top:14px;}
+  .settings-row input{
+    background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    border-radius:6px;padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+  }
+  .settings-row button{
+    background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;
+  }
+  .settings-row button:hover{border-color:var(--amber);color:var(--amber);}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const DAYNAMES = ["Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7","Chủ nhật"];
+const DAYSUB = {
+  0:"Ngày làm việc — khung 1 tiếng vàng buổi tối",
+  1:"Ngày làm việc — khung 1 tiếng vàng buổi tối",
+  2:"Ngày làm việc — khung 1 tiếng vàng buổi tối",
+  3:"Ngày làm việc — khung 1 tiếng vàng buổi tối",
+  4:"Ngày làm việc — khung 1 tiếng vàng buổi tối",
+  5:"Khối thời gian lớn buổi sáng — chuẩn bị cho cả tuần sau",
+  6:"Nghỉ hoàn toàn với gia đình"
+};
+
+// PHASE DEFINITIONS
+const PHASES = [
+  {key:"A", name:"ĐỊNH VỊ LẠI KÊNH", weeks:[1,2,3]},
+  {key:"B", name:"SẢN XUẤT ĐỀU",      weeks:[4,5,6]},
+  {key:"C", name:"MONETIZE",          weeks:[7,8,9]},
+  {key:"D", name:"TỐI ƯU & SCALE",    weeks:[10,11,12]},
+];
+
+// TASKS[phaseKey][dayIndex] = [{tag, text}]
+const TASKS = {
+A:{
+ 0:[{tag:"tiktok",text:"Xem lại 15 video cũ, đánh dấu video nào tương tác cao nhất liên quan sửa máy / phần mềm"},
+    {tag:"ai",text:"Dùng ChatGPT hoặc Gemini viết thử 3 kịch bản chủ đề \"dùng AI để sửa lỗi máy tính nhanh hơn\""}],
+ 1:[{tag:"ai",text:"Học 1 công cụ AI dựng video (CapCut AI hoặc tương tự) trong 30 phút"},
+    {tag:"tiktok",text:"Ghi lại 5 chủ đề \"công cụ AI\" mà follow cũ có thể quan tâm (chẩn đoán lỗi máy, viết email công việc, tự động hoá Excel...)"}],
+ 2:[{tag:"tiktok",text:"Quay 1 video test chủ đề AI tool bằng điện thoại — không cần thiết bị xịn"},
+    {tag:"dichvu",text:"Nhắn hỏi thăm 3 khách cũ từng nhờ sửa máy, gợi ý hướng dịch vụ mới"}],
+ 3:[{tag:"ai",text:"Dùng AI dựng thumbnail và viết caption cho video vừa quay"},
+    {tag:"tiktok",text:"Đăng video test đầu tiên, ghi lại giờ đăng để so sánh sau"}],
+ 4:[{tag:"tiktok",text:"Đo lường video test: view, comment, share so với video cũ"},
+    {tag:"congviec",text:"Ghi lại 1 việc đã làm ở công ty liên quan AI / tự động hoá — dùng làm hồ sơ thăng tiến sau"}],
+ 5:[{tag:"tiktok",text:"Quay 3-4 video chủ đề AI tool cho cả tuần sau"},
+    {tag:"ai",text:"Học thêm 1 công cụ dựng video AI để tăng tốc sản xuất"}],
+ 6:[{tag:"suckhoe",text:"Nghỉ hoàn toàn — không đụng máy quay, không lên kế hoạch"}]
+},
+B:{
+ 0:[{tag:"tiktok",text:"Đăng video đã dựng sẵn cuối tuần, trả lời hết comment trong 15 phút"}],
+ 1:[{tag:"ai",text:"Thử quy trình mới: dùng AI viết kịch bản tự động cho 3 video liên tiếp, đo thời gian tiết kiệm được"}],
+ 2:[{tag:"dichvu",text:"Chốt ít nhất 1 khách dịch vụ trả phí (sửa máy hoặc tư vấn dùng AI cho công việc văn phòng)"}],
+ 3:[{tag:"tiktok",text:"Đăng video, trả lời comment, ghi chú chủ đề nào ra nhiều comment hỏi mua nhất"}],
+ 4:[{tag:"congviec",text:"Áp dụng 1 công cụ AI vào việc IT thật ở công ty (viết script bằng AI, tự động hoá report...), ghi lại kết quả"}],
+ 5:[{tag:"tiktok",text:"Quay/dựng loạt video tuần sau bằng quy trình AI đã tối ưu"},
+    {tag:"dichvu",text:"Soạn bảng giá dịch vụ rõ ràng để gửi khách"}],
+ 6:[{tag:"suckhoe",text:"Nghỉ hoàn toàn với gia đình"}]
+},
+C:{
+ 0:[{tag:"dichvu",text:"Đăng bài giới thiệu sản phẩm/dịch vụ số đầu tiên (checklist AI tools cho dân văn phòng, giá nhỏ) lên fanpage"}],
+ 1:[{tag:"ai",text:"Test 1 công cụ AI trả lời tin nhắn khách tự động (chatbot đơn giản) để tiết kiệm thời gian"}],
+ 2:[{tag:"dichvu",text:"Follow up khách đã quan tâm nhưng chưa chốt, hỏi lý do còn đắn đo"}],
+ 3:[{tag:"tiktok",text:"Đăng video case study thật: 1 vấn đề IT đã dùng AI giải quyết nhanh thế nào"}],
+ 4:[{tag:"dichvu",text:"Chốt doanh thu tuần này, ghi vào bảng theo dõi dòng tiền phụ"}],
+ 5:[{tag:"tiktok",text:"Quay nội dung tuần mới"},
+    {tag:"dichvu",text:"Xử lý đơn hàng / khách đang chờ"}],
+ 6:[{tag:"suckhoe",text:"Nghỉ hoàn toàn với gia đình"}]
+},
+D:{
+ 0:[{tag:"dichvu",text:"Xem lại 3 tuần gần nhất: kênh nào ra tiền nhiều nhất (dịch vụ, sản phẩm số, hay tư vấn AI)?"}],
+ 1:[{tag:"tiktok",text:"Cắt giảm nội dung không hiệu quả, dồn 100% vào chủ đề đang có đơn hàng thật"}],
+ 2:[{tag:"dichvu",text:"Cân nhắc tăng giá dịch vụ nhẹ nếu đã có khách quay lại"}],
+ 3:[{tag:"ai",text:"Tự động hoá bước lặp lại nhiều nhất trong quy trình (mẫu tin nhắn, kịch bản có sẵn)"}],
+ 4:[{tag:"congviec",text:"Tổng kết 12 tuần, chuẩn bị số liệu để báo cáo / xin đánh giá công việc nếu liên quan"}],
+ 5:[{tag:"tiktok",text:"Lên kế hoạch 12 tuần tiếp theo dựa trên dữ liệu thật đã thu thập"}],
+ 6:[{tag:"suckhoe",text:"Nghỉ, nhìn lại cả hành trình 12 tuần"}]
+}
+};
+
+const TAG_LABEL = {tiktok:"TIKTOK", ai:"AI TOOL", dichvu:"DỊCH VỤ", congviec:"CÔNG VIỆC", suckhoe:"SỨC KHỎE", hocai:"HỌC AI"};
+
+// LỘ TRÌNH HỌC AI — 1 chủ đề / tuần, 1 bước nhỏ mỗi ngày (Thứ 2 - Thứ 6)
+const AI_LEARNING = {
+ 1:{topic:"Làm quen ChatGPT/Gemini — viết prompt rõ ràng", days:[
+   "Học viết 1 prompt theo công thức Vai trò – Yêu cầu – Định dạng, thử với 1 việc thật ở công ty",
+   "Học prompt \"từng bước\" để AI giải thích 1 lỗi IT phức tạp dễ hiểu hơn",
+   "Thử dùng AI tóm tắt 1 email/báo cáo tiếng Nhật dài thành gạch đầu dòng tiếng Việt",
+   "Học cách hỏi lại (refine) khi AI trả lời chưa đúng ý — quan trọng hơn hỏi lần đầu",
+   "Áp dụng AI viết 1 kịch bản TikTok hoàn chỉnh từ ý tưởng có sẵn"
+ ]},
+ 2:{topic:"AI dựng video & âm thanh cho TikTok", days:[
+   "Học tính năng phụ đề tự động (auto-caption) trong CapCut AI",
+   "Học tạo giọng đọc AI (text-to-speech) thay vì tự thu âm",
+   "Học AI tách nền / xoá vật thể trong video",
+   "Học AI đề xuất nhạc nền phù hợp nội dung",
+   "Dựng 1 video hoàn chỉnh chỉ dùng AI từ A-Z, so sánh thời gian với cách làm cũ"
+ ]},
+ 3:{topic:"AI tạo hình ảnh & thumbnail", days:[
+   "Học tạo ảnh bằng AI (Canva AI/Ideogram) từ mô tả văn bản",
+   "Học tạo thumbnail bắt mắt bằng AI cho video TikTok",
+   "Học chỉnh sửa ảnh bằng AI (xoá phông, tăng chất lượng ảnh mờ)",
+   "Thử tạo bộ nhận diện đơn giản (avatar, màu sắc) bằng AI cho kênh",
+   "Áp dụng thumbnail AI cho toàn bộ video tuần này"
+ ]},
+ 4:{topic:"AI viết script tự động hoá công việc IT", days:[
+   "Nhờ AI viết 1 script PowerShell đơn giản (VD: liệt kê máy trong domain)",
+   "Học nhờ AI giải thích từng dòng code để hiểu logic, không copy mù",
+   "Nhờ AI viết script backup 1 thư mục nhỏ, test trên máy không quan trọng",
+   "Học cách hỏi AI debug khi script chạy không đúng",
+   "Áp dụng 1 script có AI hỗ trợ vào việc thật ở công ty (việc nhỏ, an toàn)"
+ ]},
+ 5:{topic:"AI phân tích dữ liệu & báo cáo Excel", days:[
+   "Nhờ AI viết công thức Excel phức tạp (VLOOKUP nhiều điều kiện) từ mô tả bằng lời",
+   "Nhờ AI tóm tắt số liệu thành nhận xét ngắn gọn cho sếp",
+   "Dùng AI phát hiện lỗi/bất thường trong 1 bảng dữ liệu mẫu",
+   "Thử nhờ AI viết macro Excel đơn giản để tự động hoá việc lặp lại",
+   "Áp dụng vào 1 báo cáo thật đang làm ở công ty"
+ ]},
+ 6:{topic:"AI hỗ trợ dịch & soạn văn bản Nhật-Việt", days:[
+   "Dùng AI dịch nháp Nhật→Việt rồi tự hiệu đính bằng vốn N3 (nhanh hơn tự dịch)",
+   "Nhờ AI soạn email tiếng Nhật lịch sự (kính ngữ) từ ý chính tiếng Việt",
+   "Thử dùng AI dịch 1 tài liệu kỹ thuật (hướng dẫn an toàn/lỗi) Nhật-Việt",
+   "Học cách kiểm tra AI dịch sai ngữ cảnh kỹ thuật — không tin 100%",
+   "Tổng kết: AI giúp tiết kiệm bao nhiêu thời gian dịch thuật so với tự làm"
+ ]},
+ 7:{topic:"Chatbot đơn giản trả lời khách", days:[
+   "Tìm hiểu 1 công cụ chatbot đơn giản (Zalo OA/Messenger có tích hợp AI)",
+   "Viết kịch bản trả lời tự động cho 3 câu hỏi khách hay hỏi nhất",
+   "Cài đặt thử chatbot trả lời câu hỏi cơ bản về dịch vụ",
+   "Test chatbot với người thật, ghi lại chỗ trả lời sai/ngớ ngẩn",
+   "Tinh chỉnh lại kịch bản chatbot dựa trên test thực tế"
+ ]},
+ 8:{topic:"AI viết content & quảng cáo dịch vụ", days:[
+   "Nhờ AI viết 3 phiên bản caption khác nhau cho cùng 1 video, chọn cái hay nhất",
+   "Nhờ AI viết bài quảng cáo dịch vụ ngắn gọn, không sến, đúng giọng của mày",
+   "Thử A/B test 2 caption AI viết, xem cái nào tương tác tốt hơn",
+   "Nhờ AI gợi ý tiêu đề/hook đầu video thu hút 3 giây đầu",
+   "Áp dụng hook AI gợi ý cho video tuần này, so sánh tỷ lệ xem hết video"
+ ]},
+ 9:{topic:"AI phân tích xu hướng nội dung", days:[
+   "Dùng AI tóm tắt xu hướng TikTok đang hot trong ngách sửa máy/IT",
+   "Nhờ AI phân tích vì sao 1 video đối thủ viral (cấu trúc, hook, nhịp độ)",
+   "Áp dụng 1 công thức cấu trúc video học được vào video của mình",
+   "Dùng AI gợi ý 10 chủ đề video tiếp theo dựa trên hiệu suất cũ",
+   "Lên kế hoạch nội dung tuần sau dựa trên gợi ý AI + đánh giá của mày"
+ ]},
+ 10:{topic:"Automation nối nhiều công cụ AI (Zapier/Make cơ bản)", days:[
+   "Tìm hiểu khái niệm automation — khi nào nên tự động, khi nào không cần",
+   "Học nối 1 automation đơn giản (VD: khách điền form → tự động vào Google Sheet)",
+   "Thử tạo automation cho việc lặp lại nhất trong quy trình bán dịch vụ",
+   "Test automation, xử lý lỗi phát sinh",
+   "Đánh giá automation có tiết kiệm thời gian thật không, hay chỉ phức tạp hoá"
+ ]},
+ 11:{topic:"AI cho quản lý thời gian & năng suất cá nhân", days:[
+   "Học dùng AI lập lịch tuần dựa trên deadline và mức độ ưu tiên",
+   "Nhờ AI tóm tắt việc cần làm từ ghi chú lộn xộn của mày",
+   "Thử dùng AI review lại tuần đã qua, chỉ ra điều nên cải thiện",
+   "Học cách dùng AI như trợ lý nhắc việc mà không phụ thuộc quá mức",
+   "Tổng kết cách AI đã thay đổi năng suất làm việc/nội dung sau 11 tuần"
+ ]},
+ 12:{topic:"Tổng kết & chọn bộ công cụ AI lõi để dùng lâu dài", days:[
+   "Liệt kê tất cả công cụ AI đã học qua 12 tuần, đánh giá cái nào thực sự hữu ích",
+   "Chọn ra 3 công cụ AI cốt lõi sẽ dùng thường xuyên sau sprint này",
+   "Viết lại quy trình làm nội dung + dịch vụ chuẩn hoá dùng 3 công cụ đó",
+   "Chia sẻ 1 video \"hành trình 12 tuần dùng AI\" — vừa làm nội dung vừa tổng kết cho follow xem",
+   "Lên kế hoạch AI learning track tiếp theo cho 12 tuần kế (nếu cần)"
+ ]}
+};
+
+let state = {
+  startDate: null,
+  activeTab: "today",
+  checks: {}, // dateStr -> [bool,...]
+  loaded:false
+};
+
+function fmtDate(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function todayStr(){ return fmtDate(new Date()); }
+
+async function loadState(){
+  try{
+    const r = await window.storage.get("sprint:start_date");
+    state.startDate = r ? r.value : null;
+  }catch(e){ state.startDate = null; }
+  if(!state.startDate){
+    state.startDate = todayStr();
+    try{ await window.storage.set("sprint:start_date", state.startDate); }catch(e){}
+  }
+  state.loaded = true;
+}
+
+async function getChecks(dateStr){
+  try{
+    const r = await window.storage.get("checks:"+dateStr);
+    return r ? JSON.parse(r.value) : [];
+  }catch(e){ return []; }
+}
+async function setChecks(dateStr, arr){
+  try{ await window.storage.set("checks:"+dateStr, JSON.stringify(arr)); }catch(e){}
+}
+
+function dayInfo(dateStr){
+  const start = new Date(state.startDate+"T00:00:00");
+  const d = new Date(dateStr+"T00:00:00");
+  const diffDays = Math.floor((d-start)/86400000);
+  const weekNum = Math.min(12, Math.max(1, Math.floor(diffDays/7)+1));
+  const dow = d.getDay(); // 0 sun .. 6 sat
+  const dayIndex = dow===0 ? 6 : dow-1; // 0=Mon..6=Sun
+  const phase = PHASES.find(p=>p.weeks.includes(weekNum)) || PHASES[3];
+  const weekInPhase = phase.weeks.indexOf(weekNum)+1;
+  const dayOfWeekOverall = diffDays+1;
+  return {weekNum, dayIndex, phase, weekInPhase, diffDays, dayOfWeekOverall};
+}
+
+function getTasksForDate(dateStr){
+  const info = dayInfo(dateStr);
+  const base = (TASKS[info.phase.key][info.dayIndex]||[]).slice();
+  const learning = AI_LEARNING[info.weekNum];
+  if(learning){
+    if(info.dayIndex<=4){
+      base.push({tag:"hocai", text: learning.days[info.dayIndex]});
+    }else if(info.dayIndex===5){
+      base.push({tag:"hocai", text: "Ôn lại nhanh chủ đề tuần này: "+learning.topic});
+    }
+  }
+  return base;
+}
+
+async function computeStreak(){
+  // count consecutive past days (including today if fully done) where all tasks were checked
+  let streak = 0;
+  let cursor = new Date();
+  for(let i=0;i<60;i++){
+    const ds = fmtDate(cursor);
+    const tasks = getTasksForDate(ds);
+    const checks = await getChecks(ds);
+    const allDone = tasks.length>0 && tasks.every((_,idx)=>checks[idx]);
+    if(allDone){ streak++; cursor.setDate(cursor.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function tagClass(tag){ return "task-tag tag-"+tag; }
+
+async function renderToday(container){
+  const ds = todayStr();
+  const info = dayInfo(ds);
+  const tasks = getTasksForDate(ds);
+  const learning = AI_LEARNING[info.weekNum];
+  const checks = await getChecks(ds);
+  const doneCount = tasks.filter((_,i)=>checks[i]).length;
+  const streak = await computeStreak();
+  const pct = Math.round((info.weekNum/12)*100);
+
+  const dateObj = new Date();
+  const dateLabel = dateObj.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  container.innerHTML = `
+    <div class="stats-row">
+      <div class="stat"><div class="n">${info.weekNum}/12</div><div class="l">Tuần sprint</div></div>
+      <div class="stat"><div class="n">${streak}</div><div class="l">Streak (ngày)</div></div>
+      <div class="stat"><div class="n">${doneCount}/${tasks.length}</div><div class="l">Hôm nay</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-labels"><span>Tiến độ sprint 10tr đầu tiên</span><span>${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="card">
+      <div class="phase-tag">PHASE ${info.phase.key} · ${info.phase.name} · TUẦN ${info.weekInPhase}/3</div>
+      <div class="day-title">${DAYNAMES[info.dayIndex]} — ${dateLabel}</div>
+      <div class="day-sub">${DAYSUB[info.dayIndex]}</div>
+      ${learning ? `<div class="week-topic">🎯 Học AI tuần này: <b>${learning.topic}</b></div>` : ""}
+      <div id="task-list"></div>
+    </div>
+  `;
+
+  const list = container.querySelector("#task-list");
+  if(tasks.length===0){
+    list.innerHTML = `<div class="empty-note">Không có việc nào hôm nay — nghỉ ngơi đúng nghĩa.</div>`;
+  }else{
+    tasks.forEach((t,idx)=>{
+      const isChecked = !!checks[idx];
+      const row = document.createElement("div");
+      row.className = "task"+(isChecked?" done":"");
+      row.innerHTML = `
+        <div class="checkbox${isChecked?" checked":""}" data-idx="${idx}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#12161C" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>
+        </div>
+        <div class="task-body">
+          <span class="${tagClass(t.tag)}">${TAG_LABEL[t.tag]}</span>
+          <div class="task-text">${t.text}</div>
+        </div>
+      `;
+      const cb = row.querySelector(".checkbox");
+      cb.addEventListener("click", async ()=>{
+        const cur = await getChecks(ds);
+        cur[idx] = !cur[idx];
+        await setChecks(ds, cur);
+        render();
+      });
+      list.appendChild(row);
+    });
+  }
+}
+
+function renderRoadmap(container){
+  const ds = todayStr();
+  const info = dayInfo(ds);
+  container.innerHTML = `
+    <div class="card goal-card">
+      <div class="phase-tag">MỤC TIÊU DUY NHẤT</div>
+      <div class="n">10.000.000 ₫ / tháng</div>
+      <div class="empty-note">Dòng tiền thụ động đầu tiên, từ kênh TikTok cũ đổi nội dung sang chủ đề "dùng công cụ AI" — không phải 30tr, để sau.</div>
+    </div>
+    <div class="card">
+      <div class="day-title" style="font-size:16px;margin-bottom:14px;">Lộ trình 12 tuần</div>
+      ${PHASES.map(p=>{
+        const cells = p.weeks.map(w=>{
+          let cls = "week-cell";
+          if(w < info.weekNum) cls += " past";
+          if(w === info.weekNum) cls += " current";
+          return `<div class="${cls}">T${w}</div>`;
+        }).join("");
+        return `
+          <div class="phase-block">
+            <div class="phase-head"><h3>PHASE ${p.key} · ${p.name}</h3><span>${p.weeks.length} tuần</span></div>
+            <div class="week-grid">${cells}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+    <div class="card">
+      <div class="day-title" style="font-size:16px;margin-bottom:10px;">Lộ trình học AI — 1 chủ đề / tuần</div>
+      ${Object.keys(AI_LEARNING).map(w=>{
+        const wnum = parseInt(w);
+        const l = AI_LEARNING[w];
+        let cls = "task-tag tag-hocai";
+        let doneStyle = wnum < info.weekNum ? "opacity:.5;" : (wnum===info.weekNum ? "font-weight:600;" : "");
+        return `<div style="padding:8px 0;border-top:1px solid var(--border);font-size:13px;${doneStyle}">
+          <span class="${cls}" style="margin-right:8px;">T${wnum}</span>${l.topic}
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="card">
+      <div class="day-title" style="font-size:16px;margin-bottom:8px;">Ngày bắt đầu sprint</div>
+      <div class="empty-note">Mặc định là ngày đầu tiên mày mở app này. Nếu muốn đổi lại ngày bắt đầu:</div>
+      <div class="settings-row">
+        <input type="date" id="start-input" value="${state.startDate}">
+        <button id="save-start">Lưu</button>
+      </div>
+    </div>
+  `;
+  const btn = container.querySelector("#save-start");
+  btn.addEventListener("click", async ()=>{
+    const val = container.querySelector("#start-input").value;
+    if(val){
+      state.startDate = val;
+      try{ await window.storage.set("sprint:start_date", val); }catch(e){}
+      render();
+    }
+  });
+}
+
+async function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div class="brand-text">
+          <div class="t1">Đang xử lý</div>
+          <div class="t2">Ticket hôm nay</div>
+        </div>
+      </div>
+      <div class="ticket-id">TICKET #<b id="ticket-num">--</b><br>SPRINT 10TR</div>
+    </div>
+    <div class="tabs">
+      <div class="tab" data-tab="today">Hôm nay</div>
+      <div class="tab" data-tab="roadmap">Lộ trình 12 tuần</div>
+    </div>
+    <div id="content"></div>
+  `;
+  app.querySelectorAll(".tab").forEach(t=>{
+    if(t.dataset.tab===state.activeTab) t.classList.add("active");
+    t.addEventListener("click", ()=>{ state.activeTab=t.dataset.tab; render(); });
+  });
+
+  const info = dayInfo(todayStr());
+  document.getElementById("ticket-num").textContent = `W${String(info.weekNum).padStart(2,"0")}-D${String(info.dayOfWeekOverall).padStart(3,"0")}`;
+
+  const content = document.getElementById("content");
+  if(state.activeTab==="today"){
+    await renderToday(content);
+  }else{
+    renderRoadmap(content);
+  }
+}
+
+(async function init(){
+  await loadState();
+  render();
+})();
+</script>
+</body>
+</html>
