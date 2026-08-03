@@ -18,6 +18,7 @@
     --green:#3FBF7F;
     --red:#E2584A;
     --blue:#5B9FE8;
+    --violet:#B98CE8;
   }
   *{box-sizing:border-box;}
   body{
@@ -106,6 +107,13 @@
   .tag-dichvu{background:rgba(232,153,62,.15);color:var(--amber);}
   .tag-congviec{background:rgba(226,88,74,.15);color:var(--red);}
   .tag-suckhoe{background:rgba(139,147,161,.2);color:var(--muted);}
+  .tag-hocai{background:rgba(185,140,232,.16);color:var(--violet);}
+  .week-topic{
+    display:flex;gap:8px;align-items:center;background:rgba(185,140,232,.1);
+    border:1px solid rgba(185,140,232,.3);border-radius:10px;padding:9px 12px;
+    font-size:12.5px;margin-bottom:14px;color:#D3B6F2;
+  }
+  .week-topic b{color:#fff;}
   .task-text{font-size:14px;line-height:1.5;}
 
   .empty-note{font-size:13px;color:var(--muted);line-height:1.6;}
@@ -222,7 +230,95 @@ D:{
 }
 };
 
-const TAG_LABEL = {tiktok:"TIKTOK", ai:"AI TOOL", dichvu:"DỊCH VỤ", congviec:"CÔNG VIỆC", suckhoe:"SỨC KHỎE"};
+const TAG_LABEL = {tiktok:"TIKTOK", ai:"AI TOOL", dichvu:"DỊCH VỤ", congviec:"CÔNG VIỆC", suckhoe:"SỨC KHỎE", hocai:"HỌC AI"};
+
+// LỘ TRÌNH HỌC AI — 1 chủ đề / tuần, 1 bước nhỏ mỗi ngày (Thứ 2 - Thứ 6)
+const AI_LEARNING = {
+ 1:{topic:"Làm quen ChatGPT/Gemini — viết prompt rõ ràng", days:[
+   "Học viết 1 prompt theo công thức Vai trò – Yêu cầu – Định dạng, thử với 1 việc thật ở công ty",
+   "Học prompt \"từng bước\" để AI giải thích 1 lỗi IT phức tạp dễ hiểu hơn",
+   "Thử dùng AI tóm tắt 1 email/báo cáo tiếng Nhật dài thành gạch đầu dòng tiếng Việt",
+   "Học cách hỏi lại (refine) khi AI trả lời chưa đúng ý — quan trọng hơn hỏi lần đầu",
+   "Áp dụng AI viết 1 kịch bản TikTok hoàn chỉnh từ ý tưởng có sẵn"
+ ]},
+ 2:{topic:"AI dựng video & âm thanh cho TikTok", days:[
+   "Học tính năng phụ đề tự động (auto-caption) trong CapCut AI",
+   "Học tạo giọng đọc AI (text-to-speech) thay vì tự thu âm",
+   "Học AI tách nền / xoá vật thể trong video",
+   "Học AI đề xuất nhạc nền phù hợp nội dung",
+   "Dựng 1 video hoàn chỉnh chỉ dùng AI từ A-Z, so sánh thời gian với cách làm cũ"
+ ]},
+ 3:{topic:"AI tạo hình ảnh & thumbnail", days:[
+   "Học tạo ảnh bằng AI (Canva AI/Ideogram) từ mô tả văn bản",
+   "Học tạo thumbnail bắt mắt bằng AI cho video TikTok",
+   "Học chỉnh sửa ảnh bằng AI (xoá phông, tăng chất lượng ảnh mờ)",
+   "Thử tạo bộ nhận diện đơn giản (avatar, màu sắc) bằng AI cho kênh",
+   "Áp dụng thumbnail AI cho toàn bộ video tuần này"
+ ]},
+ 4:{topic:"AI viết script tự động hoá công việc IT", days:[
+   "Nhờ AI viết 1 script PowerShell đơn giản (VD: liệt kê máy trong domain)",
+   "Học nhờ AI giải thích từng dòng code để hiểu logic, không copy mù",
+   "Nhờ AI viết script backup 1 thư mục nhỏ, test trên máy không quan trọng",
+   "Học cách hỏi AI debug khi script chạy không đúng",
+   "Áp dụng 1 script có AI hỗ trợ vào việc thật ở công ty (việc nhỏ, an toàn)"
+ ]},
+ 5:{topic:"AI phân tích dữ liệu & báo cáo Excel", days:[
+   "Nhờ AI viết công thức Excel phức tạp (VLOOKUP nhiều điều kiện) từ mô tả bằng lời",
+   "Nhờ AI tóm tắt số liệu thành nhận xét ngắn gọn cho sếp",
+   "Dùng AI phát hiện lỗi/bất thường trong 1 bảng dữ liệu mẫu",
+   "Thử nhờ AI viết macro Excel đơn giản để tự động hoá việc lặp lại",
+   "Áp dụng vào 1 báo cáo thật đang làm ở công ty"
+ ]},
+ 6:{topic:"AI hỗ trợ dịch & soạn văn bản Nhật-Việt", days:[
+   "Dùng AI dịch nháp Nhật→Việt rồi tự hiệu đính bằng vốn N3 (nhanh hơn tự dịch)",
+   "Nhờ AI soạn email tiếng Nhật lịch sự (kính ngữ) từ ý chính tiếng Việt",
+   "Thử dùng AI dịch 1 tài liệu kỹ thuật (hướng dẫn an toàn/lỗi) Nhật-Việt",
+   "Học cách kiểm tra AI dịch sai ngữ cảnh kỹ thuật — không tin 100%",
+   "Tổng kết: AI giúp tiết kiệm bao nhiêu thời gian dịch thuật so với tự làm"
+ ]},
+ 7:{topic:"Chatbot đơn giản trả lời khách", days:[
+   "Tìm hiểu 1 công cụ chatbot đơn giản (Zalo OA/Messenger có tích hợp AI)",
+   "Viết kịch bản trả lời tự động cho 3 câu hỏi khách hay hỏi nhất",
+   "Cài đặt thử chatbot trả lời câu hỏi cơ bản về dịch vụ",
+   "Test chatbot với người thật, ghi lại chỗ trả lời sai/ngớ ngẩn",
+   "Tinh chỉnh lại kịch bản chatbot dựa trên test thực tế"
+ ]},
+ 8:{topic:"AI viết content & quảng cáo dịch vụ", days:[
+   "Nhờ AI viết 3 phiên bản caption khác nhau cho cùng 1 video, chọn cái hay nhất",
+   "Nhờ AI viết bài quảng cáo dịch vụ ngắn gọn, không sến, đúng giọng của mày",
+   "Thử A/B test 2 caption AI viết, xem cái nào tương tác tốt hơn",
+   "Nhờ AI gợi ý tiêu đề/hook đầu video thu hút 3 giây đầu",
+   "Áp dụng hook AI gợi ý cho video tuần này, so sánh tỷ lệ xem hết video"
+ ]},
+ 9:{topic:"AI phân tích xu hướng nội dung", days:[
+   "Dùng AI tóm tắt xu hướng TikTok đang hot trong ngách sửa máy/IT",
+   "Nhờ AI phân tích vì sao 1 video đối thủ viral (cấu trúc, hook, nhịp độ)",
+   "Áp dụng 1 công thức cấu trúc video học được vào video của mình",
+   "Dùng AI gợi ý 10 chủ đề video tiếp theo dựa trên hiệu suất cũ",
+   "Lên kế hoạch nội dung tuần sau dựa trên gợi ý AI + đánh giá của mày"
+ ]},
+ 10:{topic:"Automation nối nhiều công cụ AI (Zapier/Make cơ bản)", days:[
+   "Tìm hiểu khái niệm automation — khi nào nên tự động, khi nào không cần",
+   "Học nối 1 automation đơn giản (VD: khách điền form → tự động vào Google Sheet)",
+   "Thử tạo automation cho việc lặp lại nhất trong quy trình bán dịch vụ",
+   "Test automation, xử lý lỗi phát sinh",
+   "Đánh giá automation có tiết kiệm thời gian thật không, hay chỉ phức tạp hoá"
+ ]},
+ 11:{topic:"AI cho quản lý thời gian & năng suất cá nhân", days:[
+   "Học dùng AI lập lịch tuần dựa trên deadline và mức độ ưu tiên",
+   "Nhờ AI tóm tắt việc cần làm từ ghi chú lộn xộn của mày",
+   "Thử dùng AI review lại tuần đã qua, chỉ ra điều nên cải thiện",
+   "Học cách dùng AI như trợ lý nhắc việc mà không phụ thuộc quá mức",
+   "Tổng kết cách AI đã thay đổi năng suất làm việc/nội dung sau 11 tuần"
+ ]},
+ 12:{topic:"Tổng kết & chọn bộ công cụ AI lõi để dùng lâu dài", days:[
+   "Liệt kê tất cả công cụ AI đã học qua 12 tuần, đánh giá cái nào thực sự hữu ích",
+   "Chọn ra 3 công cụ AI cốt lõi sẽ dùng thường xuyên sau sprint này",
+   "Viết lại quy trình làm nội dung + dịch vụ chuẩn hoá dùng 3 công cụ đó",
+   "Chia sẻ 1 video \"hành trình 12 tuần dùng AI\" — vừa làm nội dung vừa tổng kết cho follow xem",
+   "Lên kế hoạch AI learning track tiếp theo cho 12 tuần kế (nếu cần)"
+ ]}
+};
 
 let state = {
   startDate: null,
@@ -238,24 +334,23 @@ function todayStr(){ return fmtDate(new Date()); }
 
 async function loadState(){
   try{
-    const r = await window.storage.get("sprint:start_date");
-    state.startDate = r ? r.value : null;
+    state.startDate = localStorage.getItem("sprint_start_date");
   }catch(e){ state.startDate = null; }
   if(!state.startDate){
     state.startDate = todayStr();
-    try{ await window.storage.set("sprint:start_date", state.startDate); }catch(e){}
+    try{ localStorage.setItem("sprint_start_date", state.startDate); }catch(e){}
   }
   state.loaded = true;
 }
 
 async function getChecks(dateStr){
   try{
-    const r = await window.storage.get("checks:"+dateStr);
-    return r ? JSON.parse(r.value) : [];
+    const v = localStorage.getItem("checks_"+dateStr);
+    return v ? JSON.parse(v) : [];
   }catch(e){ return []; }
 }
 async function setChecks(dateStr, arr){
-  try{ await window.storage.set("checks:"+dateStr, JSON.stringify(arr)); }catch(e){}
+  try{ localStorage.setItem("checks_"+dateStr, JSON.stringify(arr)); }catch(e){}
 }
 
 function dayInfo(dateStr){
@@ -271,14 +366,27 @@ function dayInfo(dateStr){
   return {weekNum, dayIndex, phase, weekInPhase, diffDays, dayOfWeekOverall};
 }
 
+function getTasksForDate(dateStr){
+  const info = dayInfo(dateStr);
+  const base = (TASKS[info.phase.key][info.dayIndex]||[]).slice();
+  const learning = AI_LEARNING[info.weekNum];
+  if(learning){
+    if(info.dayIndex<=4){
+      base.push({tag:"hocai", text: learning.days[info.dayIndex]});
+    }else if(info.dayIndex===5){
+      base.push({tag:"hocai", text: "Ôn lại nhanh chủ đề tuần này: "+learning.topic});
+    }
+  }
+  return base;
+}
+
 async function computeStreak(){
   // count consecutive past days (including today if fully done) where all tasks were checked
   let streak = 0;
   let cursor = new Date();
   for(let i=0;i<60;i++){
     const ds = fmtDate(cursor);
-    const info = dayInfo(ds);
-    const tasks = TASKS[info.phase.key][info.dayIndex];
+    const tasks = getTasksForDate(ds);
     const checks = await getChecks(ds);
     const allDone = tasks.length>0 && tasks.every((_,idx)=>checks[idx]);
     if(allDone){ streak++; cursor.setDate(cursor.getDate()-1); }
@@ -292,7 +400,8 @@ function tagClass(tag){ return "task-tag tag-"+tag; }
 async function renderToday(container){
   const ds = todayStr();
   const info = dayInfo(ds);
-  const tasks = TASKS[info.phase.key][info.dayIndex] || [];
+  const tasks = getTasksForDate(ds);
+  const learning = AI_LEARNING[info.weekNum];
   const checks = await getChecks(ds);
   const doneCount = tasks.filter((_,i)=>checks[i]).length;
   const streak = await computeStreak();
@@ -315,6 +424,7 @@ async function renderToday(container){
       <div class="phase-tag">PHASE ${info.phase.key} · ${info.phase.name} · TUẦN ${info.weekInPhase}/3</div>
       <div class="day-title">${DAYNAMES[info.dayIndex]} — ${dateLabel}</div>
       <div class="day-sub">${DAYSUB[info.dayIndex]}</div>
+      ${learning ? `<div class="week-topic">🎯 Học AI tuần này: <b>${learning.topic}</b></div>` : ""}
       <div id="task-list"></div>
     </div>
   `;
@@ -375,6 +485,18 @@ function renderRoadmap(container){
       }).join("")}
     </div>
     <div class="card">
+      <div class="day-title" style="font-size:16px;margin-bottom:10px;">Lộ trình học AI — 1 chủ đề / tuần</div>
+      ${Object.keys(AI_LEARNING).map(w=>{
+        const wnum = parseInt(w);
+        const l = AI_LEARNING[w];
+        let cls = "task-tag tag-hocai";
+        let doneStyle = wnum < info.weekNum ? "opacity:.5;" : (wnum===info.weekNum ? "font-weight:600;" : "");
+        return `<div style="padding:8px 0;border-top:1px solid var(--border);font-size:13px;${doneStyle}">
+          <span class="${cls}" style="margin-right:8px;">T${wnum}</span>${l.topic}
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="card">
       <div class="day-title" style="font-size:16px;margin-bottom:8px;">Ngày bắt đầu sprint</div>
       <div class="empty-note">Mặc định là ngày đầu tiên mày mở app này. Nếu muốn đổi lại ngày bắt đầu:</div>
       <div class="settings-row">
@@ -388,7 +510,7 @@ function renderRoadmap(container){
     const val = container.querySelector("#start-input").value;
     if(val){
       state.startDate = val;
-      try{ await window.storage.set("sprint:start_date", val); }catch(e){}
+      try{ localStorage.setItem("sprint_start_date", val); }catch(e){}
       render();
     }
   });
