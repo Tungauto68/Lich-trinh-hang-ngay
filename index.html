@@ -334,23 +334,24 @@ function todayStr(){ return fmtDate(new Date()); }
 
 async function loadState(){
   try{
-    state.startDate = localStorage.getItem("sprint_start_date");
+    const r = await window.storage.get("sprint:start_date");
+    state.startDate = r ? r.value : null;
   }catch(e){ state.startDate = null; }
   if(!state.startDate){
     state.startDate = todayStr();
-    try{ localStorage.setItem("sprint_start_date", state.startDate); }catch(e){}
+    try{ await window.storage.set("sprint:start_date", state.startDate); }catch(e){}
   }
   state.loaded = true;
 }
 
 async function getChecks(dateStr){
   try{
-    const v = localStorage.getItem("checks_"+dateStr);
-    return v ? JSON.parse(v) : [];
+    const r = await window.storage.get("checks:"+dateStr);
+    return r ? JSON.parse(r.value) : [];
   }catch(e){ return []; }
 }
 async function setChecks(dateStr, arr){
-  try{ localStorage.setItem("checks_"+dateStr, JSON.stringify(arr)); }catch(e){}
+  try{ await window.storage.set("checks:"+dateStr, JSON.stringify(arr)); }catch(e){}
 }
 
 function dayInfo(dateStr){
@@ -510,7 +511,7 @@ function renderRoadmap(container){
     const val = container.querySelector("#start-input").value;
     if(val){
       state.startDate = val;
-      try{ localStorage.setItem("sprint_start_date", val); }catch(e){}
+      try{ await window.storage.set("sprint:start_date", val); }catch(e){}
       render();
     }
   });
